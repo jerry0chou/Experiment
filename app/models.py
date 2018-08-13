@@ -113,11 +113,11 @@ if __name__ == "__main__":
     """
     db.create_all()
     """
-
+    print("testRole")
     # 测试插入数据
     """
     role=Role(
-    name="实验员",
+    name="教师",
     )
     
     db.session.add(role)
@@ -136,5 +136,8 @@ if __name__ == "__main__":
     db.session.add(user)
     db.session.commit()
     """
-
+    # role=Role.query.filter_by(name="教师").first()
+    # print(role)
+    # user = User.query.filter_by(username="jerry").first()
+    # print(user)
 # cd 到 app 命令行运行 python models.py
