@@ -1,8 +1,7 @@
 # coding:utf-8
 from . import lab
-
 from flask import render_template, request, Response
-from .forms import handleLogin,handleGetUser,handleGetAllUser
+from .forms import handleLogin,handleGetUser,handleGetAllUser,handleRemoveUser,handleSummitUserEditForm
 
 
 @lab.route('/')
@@ -33,3 +32,19 @@ def getAllUser():
         return handleGetAllUser(int(page),int(per_page))
     else:
         return "error"
+
+@lab.route('/removeUser',methods=['POST'])
+def removeUser():
+    account = request.form.get('account', None)
+    return handleRemoveUser(account)
+
+
+#summitUserEditForm
+@lab.route('/summitUserEditForm',methods=['POST'])
+def summitUserEditForm():
+    account = request.form.get('account', None)
+    username = request.form.get('username', None)
+    phone = request.form.get('phone', None)
+    roleName = request.form.get('roleName', None)
+    password=request.form.get('password', None)
+    return handleSummitUserEditForm(account,username,phone,roleName,password)

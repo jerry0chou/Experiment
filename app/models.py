@@ -1,16 +1,16 @@
 from datetime import datetime
-# from app import db
+from app import db
 
-from werkzeug.security import generate_password_hash
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-
-app = Flask(__name__)
-app.debug = True
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/labpro.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-db = SQLAlchemy(app)
+# from werkzeug.security import generate_password_hash
+# from flask import Flask
+# from flask_sqlalchemy import SQLAlchemy
+#
+# app = Flask(__name__)
+# app.debug = True
+#
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/labpro.db'
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+# db = SQLAlchemy(app)
 
 
 # 角色
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     """
     db.create_all()
     """
-    print("testRole")
+    #print("testRole")
     # 测试插入数据
     """
     role=Role(
@@ -145,7 +145,7 @@ if __name__ == "__main__":
     """
 
     # 测试插入admin 并且生成哈希密码
-    #"""
+    """
 
     from werkzeug.security import generate_password_hash
     user=User(
@@ -157,13 +157,13 @@ if __name__ == "__main__":
     )
     db.session.add(user)
     db.session.commit()
-    #"""
+    """
     # role=Role.query.filter_by(name="教师").first()
     # print(role)
 
     # 修改
-    # user = User.query.filter_by(username="jerry").first()
-    # user.password = generate_password_hash("123")
+    # user = User.query.filter_by(account="David12").first()
+    # user.username = "李伟"
     # db.session.commit()
     # print(user)
 
@@ -185,4 +185,30 @@ if __name__ == "__main__":
     #     print(r.to_json())
     # print(roles)
 
+    # raw sql
+    # result = db.engine.execute("select uid,user.rid,account,username,phone,name from user,role where user.rid=role.rid")
+    # userList = []
+    # for row in result:
+    #     user={}
+    #     user['uid']=row[0]
+    #     user['rid'] = row[1]
+    #     user['account'] = row[2]
+    #     user['username'] = row[3]
+    #     user['phone'] = row[4]
+    #     user['roleName'] = row[5]
+    #     userList.append(user)
+    # print(userList)
+    #
+    # res=db.engine.execute("select count(*) from user")
+    # count=[r[0] for r in res][0]
+    # print(count)
+    #print(res[0])
+
+    # roles = Role.query.all()
+    # roleJson = [r.to_json() for r in roles]
+    # print(roleJson)
+
+    role = Role.query.filter_by(name="教师").first()
+    print(role)
+    print(role.rid)
 # cd 到 app 命令行运行 python models.py

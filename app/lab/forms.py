@@ -4,6 +4,8 @@ from werkzeug.security import check_password_hash
 from flask import jsonify
 import json
 
+from werkzeug.security import generate_password_hash
+
 
 def handleLogin(account, password):
     user = User.query.filter_by(account=account).first()
@@ -21,8 +23,10 @@ def handleGetUser(account):
     return json.dumps(userJson)
 
 
-def handleGetAllUser(page,per_page):
+def handleGetAllUser(page, per_page):
     users = User.query.paginate(page=page, per_page=per_page, error_out=False)
+    res = db.engine.execute("select count(*) from user")
+    count = [r[0] for r in res][0]
     roles = Role.query.all()
     roleJson = [r.to_json() for r in roles]
     userList = []
@@ -38,25 +42,38 @@ def handleGetAllUser(page,per_page):
     makeUsers(users.items)
     pageInfo = {
         "users": userList,
-        "pages": users.pages,
-        "prev_num": users.prev_num,
-        "has_prev": users.has_prev,
-        "next_num": users.next_num,
-        "has_next": users.has_next,
-        "next_num": users.next_num
+        "count": count,
+        "roleList": roleJson
     }
-    print("pageInfo",pageInfo)
+    print("pageInfo", pageInfo)
     return json.dumps(pageInfo)
 
-    # print(type(users))
-    # print(users.items)
-    # print(users.pages)
-    # print(users.prev_num)
-    # print(users.has_prev)
-    # print(users.next_num)
-    # print(users.next())  # 对象
-    # print(users.has_next)
-    # print(users.next_num)
-    # print(type(users.next_num))
 
-    # return json.dumps(userJson)
+def handleRemoveUser(account):
+    user = User.query.filter_by(account=account).first()
+    print(user)
+    if user:
+        print(user.account)
+        db.session.delete(user)
+        db.session.commit()
+        return "success"
+    else:
+        return "failure"
+
+
+def handleSummitUserEditForm(account, username, phone, roleName, password):
+    user = User.query.filter_by(account=account).first()
+    role = Role.query.filter_by(name=roleName).first()
+
+    print("roleName:",len(roleName),"role",role.rid,role.name)
+    print("summitUser",account, username, phone, password, roleName)
+
+    if user :
+        user.username=username
+        user.password=generate_password_hash(password)
+        user.rid=role.rid
+        user.phone=phone
+        db.session.commit()
+        return "success"
+    else:
+        return "failure"
