@@ -65,15 +65,65 @@ def handleSummitUserEditForm(account, username, phone, roleName, password):
     user = User.query.filter_by(account=account).first()
     role = Role.query.filter_by(name=roleName).first()
 
-    print("roleName:",len(roleName),"role",role.rid,role.name)
-    print("summitUser",account, username, phone, password, roleName)
+    print("roleName:", len(roleName), "role", role.rid, role.name)
+    print("summitUser", account, username, phone, password, roleName)
+    print("password:", type(password), password, " password='' ", password == '')
 
-    if user :
-        user.username=username
-        user.password=generate_password_hash(password)
-        user.rid=role.rid
-        user.phone=phone
+    if user:
+        user.username = username
+        if password != '':
+            user.password = generate_password_hash(password)
+        user.rid = role.rid
+        user.phone = phone
         db.session.commit()
         return "success"
     else:
         return "failure"
+
+
+def handleSummitUserRegisterForm(account, username, phone, roleName, password):
+    user = User.query.filter_by(account=account).first()
+    if user:
+        return "账户已存在，不能注册"
+    else:
+        role = Role.query.filter_by(name=roleName).first()
+        user = User(
+            rid=role.rid,
+            account=account,
+            username=username,
+            password=generate_password_hash(password),
+            phone=phone
+        )
+        db.session.add(user)
+        db.session.commit()
+        print("handleSummitUserRegisterForm", account, username, phone, password, roleName)
+        return "success"
+
+
+def handleQueryUser(account):
+    user = User.query.filter_by(account=account).first()
+    roles = Role.query.all()
+    roleJson = [r.to_json() for r in roles]
+    print(roleJson)
+    users = []
+    if user:
+        print(account)
+        userJson = user.to_json()
+        for role in roleJson:
+            if role["rid"] == user.rid:
+                userJson["roleName"] = role['name']
+        users.append(userJson)
+        print(users)
+        return json.dumps(users)
+    else:
+        return "failure"
+
+
+def handleBatchDelete(accountList):
+    for account in accountList:
+        user = User.query.filter_by(account=account).first()
+        if user:
+            print(user.account)
+            db.session.delete(user)
+            db.session.commit()
+    return "success"
