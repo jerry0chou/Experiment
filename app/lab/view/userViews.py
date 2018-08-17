@@ -1,7 +1,7 @@
 # coding:utf-8
-from . import lab
+from app.lab import lab
 from flask import render_template, request, Response
-from .forms import handleLogin, handleGetUser, handleGetAllUser, handleRemoveUser, handleSummitUserEditForm, \
+from app.lab.handle.handleUser import handleLogin, handleGetUser, handleGetAllUser, handleRemoveUser, handleSummitUserEditForm, \
     handleSummitUserRegisterForm, handleQueryUser, handleBatchDelete
 import json
 

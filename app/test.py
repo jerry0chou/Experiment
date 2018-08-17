@@ -1,3 +1,3 @@
-from app.lab.forms import handleLogin
+from app.lab.handle.handleUser import handleLogin
 
 print(handleLogin("jerry",123))
