@@ -4,3 +4,4 @@ lab=Blueprint('lab',__name__)
 
 import app.lab.view.userViews
 import app.lab.view.roleViews
+import app.lab.view.applianceViews

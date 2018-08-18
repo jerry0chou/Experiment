@@ -66,6 +66,15 @@ class Appliance(db.Model):
     category = db.Column(db.String(50))  # 仪器型号
     note = db.Column(db.String(100), default="")  # 备注
 
+    def to_json(self):
+        return {
+            "aid": self.aid,
+            "name": self.name,
+            "manufacturer": self.manufacturer,
+            "category": self.category,
+            "note": self.note
+        }
+
     def __repr__(self):
         return '<appliance %r>' % self.name
 
@@ -79,6 +88,15 @@ class Material(db.Model):
     purity = db.Column(db.String(50))  # 材料纯度
     note = db.Column(db.String(100), default="")  # 备注
 
+    def to_json(self):
+        return {
+            "mid": self.mid,
+            "name": self.name,
+            "manufacturer": self.manufacturer,
+            "purity": self.purity,
+            "note": self.note
+        }
+
     def __repr__(self):
         return '<material %r>' % self.name
 
@@ -91,6 +109,13 @@ class Lab(db.Model):
     note = db.Column(db.String(100), default="")  # 备注
     # 关系
     experiments = db.relationship("Experiment", backref="lab")
+
+    def to_json(self):
+        return {
+            "lid": self.lid,
+            "name": self.name,
+            "note": self.note
+        }
 
     def __repr__(self):
         return '<lab %r>' % self.name
