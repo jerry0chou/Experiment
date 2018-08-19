@@ -6,3 +6,4 @@ import app.lab.view.userViews
 import app.lab.view.roleViews
 import app.lab.view.applianceViews
 import app.lab.view.materialViews
+import app.lab.view.labViews
