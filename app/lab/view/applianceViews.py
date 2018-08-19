@@ -1,6 +1,6 @@
 from app.lab import lab
 from flask import render_template, request, Response
-from app.lab.handle.handleAppliance import handleGetAppliances,handleSummitApplianceEditForm,handleSummitApplianceAddForm,handleRemoveAppliance,handleApplianceBatchDelete,handleAppllianceQueryContent
+from app.lab.handle.handleAppliance import handleGetAppliances,handleSubmitApplianceEditForm,handleSubmitApplianceAddForm,handleRemoveAppliance,handleApplianceBatchDelete,handleAppllianceQueryContent
 import json
 @lab.route('/getAppliances', methods=['POST'])
 def getAppliances():
@@ -13,22 +13,21 @@ def getAppliances():
         return "error"
 
 
-@lab.route('/summitApplianceEditForm', methods=['POST'])
-def summitApplianceEditForm():
+@lab.route('/submitApplianceEditForm', methods=['POST'])
+def submitApplianceEditForm():
     appliance = json.loads(request.form.get('appliance', None))
-    return handleSummitApplianceEditForm(appliance)
+    return handleSubmitApplianceEditForm(appliance)
 
 
-@lab.route('/summitApplianceAddForm', methods=['POST'])
-def summitApplianceAddForm():
+@lab.route('/submitApplianceAddForm', methods=['POST'])
+def submitApplianceAddForm():
     appliance = json.loads(request.form.get('appliance', None))
     #print("summitApplianceAddForm:",appliance)
-    return handleSummitApplianceAddForm(appliance)
+    return handleSubmitApplianceAddForm(appliance)
 
 @lab.route('/removeAppliance', methods=['POST'])
 def removeAppliance():
     aid = request.form.get('aid', None)
-    print("aid：",aid)
     return handleRemoveAppliance(aid)
 
 #applianceBatchDelete
@@ -45,5 +44,4 @@ def appllianceQueryContent():
     content=request.form.get('content', None)
     page=request.form.get('page', None)
     per_page=request.form.get('per_page', None)
-    print("selectType content page per_page",selectType,content,page,per_page)
     return handleAppllianceQueryContent(selectType,content,page,per_page)

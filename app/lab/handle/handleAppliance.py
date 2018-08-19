@@ -12,7 +12,7 @@ def handleGetAppliances(page,per_page):
     }
     return json.dumps(applianceInfo)
 
-def handleSummitApplianceEditForm(appliance):
+def handleSubmitApplianceEditForm(appliance):
     appli = Appliance.query.filter_by(aid=appliance['aid']).first()
     if appli:
         appli.name=appliance['name']
@@ -23,7 +23,8 @@ def handleSummitApplianceEditForm(appliance):
         return "success"
     else:
         return "failure"
-def handleSummitApplianceAddForm(appliance):
+
+def handleSubmitApplianceAddForm(appliance):
     appli=Appliance(name=appliance["name"],category=appliance["category"],manufacturer=appliance["manufacturer"],note=appliance["note"])
     db.session.add(appli)
     db.session.commit()
@@ -41,7 +42,7 @@ def handleRemoveAppliance(aid):
 
 def handleApplianceBatchDelete(aidList):
     for aid in aidList:
-        appliance = Appliance.query.filter_by(aid=aid).pan
+        appliance = Appliance.query.filter_by(aid=aid).first()
         if appliance:
             print(appliance.name)
             db.session.delete(appliance)
@@ -49,10 +50,13 @@ def handleApplianceBatchDelete(aidList):
     return "success"
 
 def handleAppllianceQueryContent(selectType,content,page,per_page):
-    query1="Appliance.query.filter_by(%s='%s').count()"%(selectType,content)
-    print(query1)
-    print("count:",eval(query1))
-    query="Appliance.query.filter_by(%s='%s').paginate(page=%s, per_page=%s, error_out=False)"%(selectType,content,page,per_page)
-    print(query)
-    print(eval(query))
-    return "success"
+    countQuery="db.session.query(Appliance).filter(Appliance."+selectType+".like('%"+content+"%')).count()"
+    count=eval(countQuery)
+    result="db.session.query(Appliance).filter(Appliance."+selectType+".like('%"+content+"%')).paginate(page="+page+", per_page="+per_page+", error_out=False)"
+    appliances=eval(result)
+    applianceInfo = {
+        'appliances': [a.to_json() for a in appliances.items],
+        'count': count
+    }
+    return json.dumps(applianceInfo)
+
