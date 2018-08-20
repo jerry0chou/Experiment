@@ -9,6 +9,7 @@ from werkzeug.security import generate_password_hash
 
 def handleLogin(account, password):
     user = User.query.filter_by(account=account).first()
+    print(user)
     if user is None or check_password_hash(user.password, password) == False:
         return "failure"
     else:

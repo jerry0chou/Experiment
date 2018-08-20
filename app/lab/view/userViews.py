@@ -14,6 +14,7 @@ def index():
 def login():
     account = request.form.get('account', None)
     password = request.form.get('password', None)
+    print("account:",account,"password:",password)
     status = handleLogin(account, password)
     return Response(status)
 

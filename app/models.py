@@ -128,7 +128,7 @@ class Experiment(db.Model):
     lid = db.Column(db.Integer, db.ForeignKey("lab.lid"))  # 实验室编号
     uid = db.Column(db.Integer, db.ForeignKey("user.uid"))  # 用户编号
     name = db.Column(db.String(50))  # 实验名称
-    data = db.Column(db.DateTime, index=True, default=datetime.now)
+    date = db.Column(db.DateTime, index=True, default=datetime.now)
     status = db.Column(db.Integer)  # 状态0未进行,1正在进行,2已进行
     # 关系
     expdatas = db.relationship("ExpData", backref="experiment")
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     # 测试插入数据
     """
     role=Role(
-    name="教师",
+    name="超级管理员",
     )
     
     db.session.add(role)
@@ -175,8 +175,8 @@ if __name__ == "__main__":
     from werkzeug.security import generate_password_hash
     user=User(
         rid=1,
-        account="Janifer325",
-        username="Janifer Macony",
+        account="Jerry",
+        username="JerryChu",
         password=generate_password_hash("123"),
         phone=12345678912
     )
@@ -233,7 +233,7 @@ if __name__ == "__main__":
     # roleJson = [r.to_json() for r in roles]
     # print(roleJson)
 
-    role = Role.query.filter_by(name="教师").first()
-    print(role)
-    print(role.rid)
+    # role = Role.query.filter_by(name="教师").first()
+    # print(role)
+    # print(role.rid)
 # cd 到 app 命令行运行 python models.py
