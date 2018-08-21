@@ -32,7 +32,6 @@ def HnadleSubmitMaterialAddForm(material):
 
 def handleRemoveMaterial(mid):
     material = Material.query.filter_by(mid=mid).first()
-    print(material)
     if material:
         db.session.delete(material)
         db.session.commit()
@@ -43,7 +42,6 @@ def handleMaterialBatchDelete(midList):
     for mid in midList:
         material = Material.query.filter_by(mid=mid).first()
         if material:
-            print(material.name)
             db.session.delete(material)
             db.session.commit()
     return "success"

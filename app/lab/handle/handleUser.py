@@ -9,7 +9,6 @@ from werkzeug.security import generate_password_hash
 
 def handleLogin(account, password):
     user = User.query.filter_by(account=account).first()
-    print(user)
     if user is None or check_password_hash(user.password, password) == False:
         return "failure"
     else:
@@ -52,9 +51,7 @@ def handleGetAllUser(page, per_page):
 
 def handleRemoveUser(account):
     user = User.query.filter_by(account=account).first()
-    print(user)
     if user:
-        print(user.account)
         db.session.delete(user)
         db.session.commit()
         return "success"
@@ -65,11 +62,6 @@ def handleRemoveUser(account):
 def handleSummitUserEditForm(account, username, phone, roleName, password):
     user = User.query.filter_by(account=account).first()
     role = Role.query.filter_by(name=roleName).first()
-
-    print("roleName:", len(roleName), "role", role.rid, role.name)
-    print("summitUser", account, username, phone, password, roleName)
-    print("password:", type(password), password, " password='' ", password == '')
-
     if user:
         user.username = username
         if password != '':
@@ -97,7 +89,6 @@ def handleSummitUserRegisterForm(account, username, phone, roleName, password):
         )
         db.session.add(user)
         db.session.commit()
-        print("handleSummitUserRegisterForm", account, username, phone, password, roleName)
         return "success"
 
 
@@ -105,16 +96,13 @@ def handleQueryUser(account):
     user = User.query.filter_by(account=account).first()
     roles = Role.query.all()
     roleJson = [r.to_json() for r in roles]
-    print(roleJson)
     users = []
     if user:
-        print(account)
         userJson = user.to_json()
         for role in roleJson:
             if role["rid"] == user.rid:
                 userJson["roleName"] = role['name']
         users.append(userJson)
-        print(users)
         return json.dumps(users)
     else:
         return "failure"
@@ -124,7 +112,6 @@ def handleBatchDelete(accountList):
     for account in accountList:
         user = User.query.filter_by(account=account).first()
         if user:
-            print(user.account)
             db.session.delete(user)
             db.session.commit()
     return "success"

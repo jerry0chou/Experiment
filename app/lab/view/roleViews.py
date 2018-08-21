@@ -9,13 +9,10 @@ def getAllRole():
 @lab.route('/addRole', methods=['POST'])
 def addRole():
     roleName=request.form.get("roleName",None)
-    print("roleName:",roleName)
     return handleAddRole(roleName)
 
 @lab.route('/editRoleName', methods=['POST'])
 def editRoleName():
     rid=request.form.get("rid",None)
     editRoleName=request.form.get("editRoleName",None)
-    print("editRoleName:",editRoleName)
-    print("rid:",rid)
     return handleEditRoleName(rid,editRoleName)

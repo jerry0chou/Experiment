@@ -15,5 +15,4 @@ def editLabName():
 @lab.route('/addLab', methods=['POST'])
 def addLab():
     labName=request.form.get("labName",None)
-    print("labName:",labName)
     return handleAddLab(labName)

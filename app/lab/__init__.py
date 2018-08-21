@@ -7,4 +7,5 @@ import app.lab.view.roleViews
 import app.lab.view.applianceViews
 import app.lab.view.materialViews
 import app.lab.view.labViews
-import app.lab.view.experimentView
+import app.lab.view.experimentViews
+import app.lab.view.expdataViews

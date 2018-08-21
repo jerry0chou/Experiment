@@ -14,7 +14,6 @@ def index():
 def login():
     account = request.form.get('account', None)
     password = request.form.get('password', None)
-    print("account:",account,"password:",password)
     status = handleLogin(account, password)
     return Response(status)
 
@@ -29,8 +28,6 @@ def getUser():
 def getAllUser():
     page = request.form.get('page', None)
     per_page = request.form.get('per_page', None)
-    print("page", page, "per_page", per_page)
-    print(type(page), type(per_page))
     if page and per_page:
         return handleGetAllUser(int(page), int(per_page))
     else:
@@ -75,5 +72,4 @@ def queryUser():
 @lab.route('/batchDelete', methods=['POST'])
 def batchDelete():
     accountList = json.loads(request.form.get('accountList', None))
-    print(accountList)
     return handleBatchDelete(accountList)

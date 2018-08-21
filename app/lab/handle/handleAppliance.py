@@ -32,7 +32,6 @@ def handleSubmitApplianceAddForm(appliance):
 
 def handleRemoveAppliance(aid):
     appliance = Appliance.query.filter_by(aid=aid).first()
-    print(appliance)
     if appliance:
         db.session.delete(appliance)
         db.session.commit()
@@ -44,7 +43,6 @@ def handleApplianceBatchDelete(aidList):
     for aid in aidList:
         appliance = Appliance.query.filter_by(aid=aid).first()
         if appliance:
-            print(appliance.name)
             db.session.delete(appliance)
             db.session.commit()
     return "success"

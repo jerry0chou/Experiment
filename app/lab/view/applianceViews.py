@@ -22,7 +22,6 @@ def submitApplianceEditForm():
 @lab.route('/submitApplianceAddForm', methods=['POST'])
 def submitApplianceAddForm():
     appliance = json.loads(request.form.get('appliance', None))
-    #print("summitApplianceAddForm:",appliance)
     return handleSubmitApplianceAddForm(appliance)
 
 @lab.route('/removeAppliance', methods=['POST'])

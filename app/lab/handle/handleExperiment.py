@@ -31,12 +31,10 @@ def handleGetExperiments(page,per_page):
         'labs':labJson,
         'users':userList
     }
-    #print(experimentInfo)
     return json.dumps(experimentInfo)
 
 def handleSubmitExperimentEditForm(experiment):
     sql='update experiment set name='+"'"+ experiment['expname']+"'"+', date='+str(experiment['date'])
-    print("EditForm",experiment)
     if type(experiment['labname']) is int:
         sql=sql+", lid="+str(experiment['labname'])
     if len(experiment['status']) ==1:
@@ -44,14 +42,11 @@ def handleSubmitExperimentEditForm(experiment):
     if type(experiment['account']) is int:
         sql+=",uid= "+str(experiment['account'])
     sql=sql+' where eid='+str(experiment['eid'])
-    print("ExperimentEditFormSQL",sql)
     db.engine.execute(text(sql))
     return "success"
 
 def handleSubmitExperimentAddForm(experiment):
-    print("AddFOrm",experiment)
     sql='INSERT INTO experiment (lid,uid,name,date,status) values (%d,%d,"%s",%d,%d)'%(experiment["labname"],experiment["account"],experiment["expname"],experiment["date"],int(experiment["status"]))
-    print(sql)
     db.engine.execute(text(sql))
     return "success"
 
@@ -60,7 +55,6 @@ def handleRemoveExperiment(eid):
     return "success"
 
 def handleExperimentBatchDelete(eidList):
-    print("eidList:",eidList)
     for eid in eidList:
         db.engine.execute('delete from experiment where eid=' + str(eid))
     return "success"
