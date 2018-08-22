@@ -5,7 +5,6 @@ import json
 def handleGetAllRole():
     roles = Role.query.all()
     roleJson = [r.to_json() for r in roles]
-    print(roleJson)
     return json.dumps(roleJson)
 
 def handleAddRole(roleName):

@@ -2,7 +2,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 #import pymysql
-
+import os
 app=Flask(__name__)
 app.debug=True
 
@@ -11,6 +11,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/labpro.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))   # refers to application_top
+APP_STATIC_DOWNLOAD = os.path.join(APP_ROOT, 'static/download')
 
 # 蓝图注册
 from app.lab import lab as lab_blueprint

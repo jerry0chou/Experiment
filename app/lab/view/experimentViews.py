@@ -1,6 +1,6 @@
 from app.lab import lab
 from flask import  request
-from app.lab.handle.handleExperiment import handleGetExperiments,handleSubmitExperimentEditForm,handleSubmitExperimentAddForm,handleRemoveExperiment,handleExperimentBatchDelete
+from app.lab.handle.handleExperiment import handleGetExperiments,handleSubmitExperimentEditForm,handleSubmitExperimentAddForm,handleRemoveExperiment,handleExperimentBatchDelete,handleExperimentQueryContent,handleDownExperiment
 import json
 @lab.route('/getExperiments', methods=['POST'])
 def getExperiment():
@@ -32,3 +32,17 @@ def removeExperiment():
 def experimentBatchDelete():
     eidList = json.loads(request.form.get('eidList', None))
     return handleExperimentBatchDelete(eidList)
+
+@lab.route('/experimentQueryContent', methods=['POST'])
+def experimentQueryContent():
+    selectType = request.form.get('selectType', None)
+    statusType = request.form.get('statusType', None)
+    content=request.form.get('content', None)
+    page=request.form.get('page', None)
+    per_page=request.form.get('per_page', None)
+    return handleExperimentQueryContent(selectType,statusType,content,int(page),int(per_page))
+
+@lab.route('/downExperiment', methods=['POST'])
+def downExperiment():
+    downloadExpStatus = request.form.get('downloadExpStatus', None)
+    return handleDownExperiment(downloadExpStatus)

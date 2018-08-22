@@ -1,7 +1,7 @@
 # coding:utf-8
 from app.lab import lab
 from flask import render_template, request, Response
-from app.lab.handle.handleUser import handleLogin, handleGetUser, handleGetAllUser, handleRemoveUser, handleSummitUserEditForm, \
+from app.lab.handle.handleUser import handleLogin, handleGetAllUser, handleRemoveUser, handleSummitUserEditForm, \
     handleSummitUserRegisterForm, handleQueryUser, handleBatchDelete
 import json
 
@@ -14,15 +14,7 @@ def index():
 def login():
     account = request.form.get('account', None)
     password = request.form.get('password', None)
-    status = handleLogin(account, password)
-    return Response(status)
-
-
-@lab.route('/getUser', methods=['POST'])
-def getUser():
-    account = request.form.get('account', None)
-    return handleGetUser(account)
-
+    return handleLogin(account, password)
 
 @lab.route('/getAllUser', methods=['POST'])
 def getAllUser():
@@ -32,7 +24,6 @@ def getAllUser():
         return handleGetAllUser(int(page), int(per_page))
     else:
         return "error"
-
 
 @lab.route('/removeUser', methods=['POST'])
 def removeUser():

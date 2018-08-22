@@ -1,7 +1,8 @@
+from sqlalchemy import text
+
 from app import db
 from app.models import User, Role
 from werkzeug.security import check_password_hash
-from flask import jsonify
 import json
 
 from werkzeug.security import generate_password_hash
@@ -9,19 +10,22 @@ from werkzeug.security import generate_password_hash
 
 def handleLogin(account, password):
     user = User.query.filter_by(account=account).first()
+    status=''
+    userJson={}
     if user is None or check_password_hash(user.password, password) == False:
-        return "failure"
+         status="failure"
     else:
-        return "success"
+        role = Role.query.get(user.rid)
+        userJson=user.to_json()
+        userJson["roleName"] = role.name
+        status = "success"
 
-
-def handleGetUser(account):
-    user = User.query.filter_by(account=account).first()
-    role = Role.query.get(user.rid)
-    userJson = user.to_json()
-    userJson["roleName"] = role.name
-    return json.dumps(userJson)
-
+    userInfo={
+        'status':status,
+        'user':userJson
+    }
+    print(userInfo)
+    return json.dumps(userInfo)
 
 def handleGetAllUser(page, per_page):
     users = User.query.paginate(page=page, per_page=per_page, error_out=False)
@@ -45,18 +49,20 @@ def handleGetAllUser(page, per_page):
         "count": count,
         "roleList": roleJson
     }
-    print("pageInfo", pageInfo)
     return json.dumps(pageInfo)
 
 
 def handleRemoveUser(account):
-    user = User.query.filter_by(account=account).first()
-    if user:
-        db.session.delete(user)
-        db.session.commit()
+    sql="""
+    select user.uid from user where user.uid in (select experiment.uid from experiment) and account='%s'
+    """%(account)
+    res = db.engine.execute(text(sql))
+    exist = [r[0] for r in res]
+    if len(exist) == 0:
+        db.engine.execute("delete from user where account='%s'"%(account))
         return "success"
     else:
-        return "failure"
+        return "该用户已经做了实验,不能删除"
 
 
 def handleSummitUserEditForm(account, username, phone, roleName, password):
@@ -110,8 +116,5 @@ def handleQueryUser(account):
 
 def handleBatchDelete(accountList):
     for account in accountList:
-        user = User.query.filter_by(account=account).first()
-        if user:
-            db.session.delete(user)
-            db.session.commit()
+        handleRemoveUser(account)
     return "success"
