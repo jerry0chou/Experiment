@@ -142,7 +142,6 @@ def handleExperimentQueryContent(selectType, statusType, content, page, per_page
 
 
 def handleDownExperiment(downloadExpStatus):
-    print("downloadExpStatus:",downloadExpStatus)
     commonSql="""
     select experiment.eid,experiment.name as expname,lab.name as labname,experiment.date,
         experiment.status,account from experiment,lab,user where experiment.lid=lab.lid
@@ -166,7 +165,6 @@ def handleDownExperiment(downloadExpStatus):
     expList['实验状态'].replace({0:"未进行",1:"正在进行",2:"已完成"},inplace=True)
     expList['实验时间'] = expList['实验时间'] // 1000
     expList['实验时间'] = expList['实验时间'].apply(timestamp_datetime)
-    print(expList.head(6))
     path = os.path.join(APP_STATIC_DOWNLOAD, 'experiment.xlsx')
-    expList.to_excel(path)
+    expList.to_excel(path,index=False)
     return  "success"

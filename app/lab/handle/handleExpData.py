@@ -1,8 +1,8 @@
 from sqlalchemy import text
 from app.models import ExpData
-from app import db
-import json
-
+from app import db,APP_STATIC_DOWNLOAD
+import json,time,os
+import pandas as pd
 
 def handleGetExpDatas(page, per_page):
     res = db.engine.execute("select count(*) as count from expdata")
@@ -107,3 +107,30 @@ def handleExpdataQueryContent(selectType,content,page,per_page):
         'count': count
     }
     return json.dumps(expdatasInfo)
+
+def handleDownExpData(userType):
+    commonSql = """
+      select experiment.name as expname,experiment.date,lab.name as labname,encapsulation,discharge,charge,eficiency,loopretention,retention
+      from experiment,lab,expdata where experiment.lid=lab.lid and expdata.eid=experiment.eid
+    """
+    expSql = ''
+    if userType=='all':
+        expSql=commonSql
+
+    else:
+        expSql=commonSql+' and experiment.uid='+userType
+
+    expDataList = pd.read_sql_query(expSql, db.engine)
+
+    def timestamp_datetime(value):
+        format = '%Y-%m-%d'
+        value = time.localtime(value)
+        dt = time.strftime(format, value)
+        return dt
+
+    expDataList.columns = ['实验名称', '实验时间', '实验地点', '包覆含量(%)', '1C首圈放电比容量(mAh/g)', '1C首圈充电比容量(mAh/g)','首圈效率(%)','1C循环50圈后放电容量','容量保持率(%)']
+    expDataList['实验时间'] = expDataList['实验时间'] // 1000
+    expDataList['实验时间'] = expDataList['实验时间'].apply(timestamp_datetime)
+    path = os.path.join(APP_STATIC_DOWNLOAD, 'expdata.xlsx')
+    expDataList.to_excel(path,index=False)
+    return "success"

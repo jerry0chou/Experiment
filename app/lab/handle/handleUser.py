@@ -24,7 +24,6 @@ def handleLogin(account, password):
         'status':status,
         'user':userJson
     }
-    print(userInfo)
     return json.dumps(userInfo)
 
 def handleGetAllUser(page, per_page):

@@ -1,7 +1,8 @@
 from app.lab import lab
-from flask import  request
-from app.lab.handle.handleExpData import handleGetExpDatas,handleSubmitExpDataEditForm,handleSubmitExpDataAddForm,handleRemoveExpData,handleExpdataBatchDelete,handleExpdataQueryContent
-import json
+from flask import request, send_file
+from app import APP_STATIC_DOWNLOAD
+from app.lab.handle.handleExpData import handleGetExpDatas,handleSubmitExpDataEditForm,handleSubmitExpDataAddForm,handleRemoveExpData,handleExpdataBatchDelete,handleExpdataQueryContent,handleDownExpData
+import json,os
 
 @lab.route('/getExpDatas', methods=['POST'])
 def getExpDatas():
@@ -40,3 +41,14 @@ def expdataQueryContent():
     page=request.form.get('page', None)
     per_page=request.form.get('per_page', None)
     return handleExpdataQueryContent(selectType,content,page,per_page)
+
+@lab.route('/downExpData', methods=['POST'])
+def downExpData():
+    userType = request.form.get('userType', None)
+
+    if handleDownExpData(userType) == 'success':
+        path = os.path.join(APP_STATIC_DOWNLOAD, 'expdata.xlsx')
+        rv = send_file(path, attachment_filename=path, as_attachment=True)
+        return rv
+    else:
+        return 'failure'

@@ -61,7 +61,6 @@ def downExperiment():
 
     if handleDownExperiment(downloadExpStatus) == 'success':
         path = os.path.join(APP_STATIC_DOWNLOAD, 'experiment.xlsx')
-        print(path)
         rv=send_file(path,attachment_filename=path,as_attachment=True)
         return rv
     else:
