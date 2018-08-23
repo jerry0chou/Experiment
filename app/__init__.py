@@ -12,7 +12,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))   # refers to application_top
-APP_STATIC_DOWNLOAD = os.path.join(APP_ROOT, 'static/download')
+APP_STATIC_DOWNLOAD = os.path.join(APP_ROOT, 'static\\download')
 
 # 蓝图注册
 from app.lab import lab as lab_blueprint

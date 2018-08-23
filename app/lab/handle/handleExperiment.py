@@ -3,6 +3,10 @@ import datetime
 from app.models import Experiment, Lab
 from app import db
 import json
+import pandas as pd
+import os
+import time
+from app import APP_STATIC_DOWNLOAD
 
 status = {0: "未进行", 1: "正在进行", 2: "已完成"}
 
@@ -82,8 +86,6 @@ def handleExperimentBatchDelete(eidList):
 
 
 def handleExperimentQueryContent(selectType, statusType, content, page, per_page):
-    print("selectType", selectType, "statusType", statusType, "content", content, "page", page, "per_page", per_page)
-
     limitSql=" LIMIT " + str((page - 1) * per_page) + " ," + str(per_page)
     commonExpSql="""
     select experiment.eid,experiment.name as expname,lab.name as labname,experiment.date,
@@ -115,8 +117,6 @@ def handleExperimentQueryContent(selectType, statusType, content, page, per_page
         elif selectType=='account':
             expSql = commonExpSql + " account= "+"'"+ content+ "'"+limitSql
             countSql = commonCountSQl + " account= "+ "'"+content+"'"
-            print(expSql)
-            print(countSql)
             experimentList, count = makeExperimentInfo(expSql, countSql)
 
     elif content != '' and statusType != '-1':
@@ -132,8 +132,6 @@ def handleExperimentQueryContent(selectType, statusType, content, page, per_page
         elif selectType=='account':
             expSql = commonExpSql + " account= "+"'"+ content+ "'"+" and status="+statusType +limitSql
             countSql = commonCountSQl + " account= "+ "'"+content+"'"+" and status="+statusType
-            print(expSql)
-            print(countSql)
             experimentList, count = makeExperimentInfo(expSql, countSql)
 
     experimentInfo = {
@@ -145,4 +143,30 @@ def handleExperimentQueryContent(selectType, statusType, content, page, per_page
 
 def handleDownExperiment(downloadExpStatus):
     print("downloadExpStatus:",downloadExpStatus)
-    return "success"
+    commonSql="""
+    select experiment.eid,experiment.name as expname,lab.name as labname,experiment.date,
+        experiment.status,account from experiment,lab,user where experiment.lid=lab.lid
+        and experiment.uid=user.uid 
+    """
+    expSql=''
+    if downloadExpStatus =='-1':
+        expSql=commonSql
+    else:
+        expSql=commonSql+" and experiment.status="+downloadExpStatus
+
+    expList=pd.read_sql_query(expSql,db.engine)
+
+    def timestamp_datetime(value):
+        format = '%Y-%m-%d'
+        value = time.localtime(value)
+        dt = time.strftime(format, value)
+        return dt
+
+    expList.columns=['实验编号', '实验名称', '实验地点','实验时间','实验状态','用户账号']
+    expList['实验状态'].replace({0:"未进行",1:"正在进行",2:"已完成"},inplace=True)
+    expList['实验时间'] = expList['实验时间'] // 1000
+    expList['实验时间'] = expList['实验时间'].apply(timestamp_datetime)
+    print(expList.head(6))
+    path = os.path.join(APP_STATIC_DOWNLOAD, 'experiment.xlsx')
+    expList.to_excel(path)
+    return  "success"
