@@ -8,6 +8,8 @@ import json
 from werkzeug.security import generate_password_hash
 
 
+
+
 def handleLogin(account, password):
     user = User.query.filter_by(account=account).first()
     status=''

@@ -1,8 +1,10 @@
 from sqlalchemy import text
-from app.models import ExpData
+from app.models import ExpData,Experiment
 from app import db,APP_STATIC_DOWNLOAD
 import json,time,os
 import pandas as pd
+import datetime
+from app.lab.handle.handleLab import handleGetLid
 
 def handleGetExpDatas(page, per_page):
     res = db.engine.execute("select count(*) as count from expdata")
@@ -134,3 +136,57 @@ def handleDownExpData(userType):
     path = os.path.join(APP_STATIC_DOWNLOAD, 'expdata.xlsx')
     expDataList.to_excel(path,index=False)
     return "success"
+
+def handleUploadExpData(path,uid):
+    uploadExcel=pd.read_excel(path)
+    print(uploadExcel.columns[0])
+    if '条件变量' in uploadExcel.columns[0]:
+        uploadExcel = pd.read_excel(path, header=None)
+        uploadExcel = uploadExcel[2:-1]
+        uploadExcel.columns = ['实验名称', '实验时间', '实验地点', '包覆含量（%）', '1C首圈放电比容量(mAh/g)', '1C首圈充电比容量(mAh/g)', '首圈效率(%)',
+                               '1C循环50圈后放电容量', '容量保持率(%)']
+        uploadExcel.reset_index(inplace=True, drop=True)
+
+    uploadExcel['实验时间'] = pd.to_datetime(uploadExcel['实验时间'])
+
+
+    # def datetime_timestamp(dt):
+    #     time.strptime(dt, '%Y-%m-%d')
+    #     s = time.mktime(time.strptime(dt, '%Y-%m-%d'))
+    #     return int(s)*1000
+
+
+
+    #uploadExcel['实验时间'] = uploadExcel['实验时间'].astype('str').apply(datetime_timestamp)
+    uploadExcel.columns = ['expname', 'date', 'labname', 'encapsulation', 'discharge', 'charge', 'eficiency',
+                           'loopretention', 'retention']
+
+    #print(uploadExcel.head())
+    length=uploadExcel.shape[0]
+    print("length",length)
+    for row in range(length):
+        excelRowJson=json.loads(uploadExcel.iloc[row].to_json(force_ascii=False))
+        print(excelRowJson)
+        if excelRowJson['expname'] == None:
+            break
+        labid=handleGetLid(excelRowJson['labname'])
+        experiment=Experiment(
+            lid=labid,
+            uid=uid,
+            name=excelRowJson['expname'],
+            date=datetime.datetime.fromtimestamp(excelRowJson['date']//1000),
+            status=2
+        )
+        db.session.add(experiment)
+        db.session.commit()
+        expdata=ExpData(
+            eid=experiment.eid,
+            encapsulation=excelRowJson['encapsulation'],
+            discharge=excelRowJson['discharge'],
+            charge=excelRowJson['charge'],
+            eficiency=excelRowJson['eficiency'],
+            loopretention=excelRowJson['loopretention'],
+            retention=excelRowJson['loopretention']
+        )
+        db.session.add(expdata)
+        db.session.commit()

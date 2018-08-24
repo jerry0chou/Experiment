@@ -25,3 +25,13 @@ def handleAddLab(labName):
         db.session.add(lab)
         db.session.commit()
         return "success"
+
+def handleGetLid(labName):
+    lab = Lab.query.filter_by(name=labName).first()
+    if lab:
+        return lab.lid
+    else:
+        lab = Lab(name=labName)
+        db.session.add(lab)
+        db.session.commit()
+        return lab.lid
