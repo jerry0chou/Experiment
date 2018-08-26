@@ -139,7 +139,7 @@ def handleDownExpData(userType):
 
 def handleUploadExpData(path,uid):
     uploadExcel=pd.read_excel(path)
-    print(uploadExcel.columns[0])
+    #print(uploadExcel.columns[0])
     if '条件变量' in uploadExcel.columns[0]:
         uploadExcel = pd.read_excel(path, header=None)
         uploadExcel = uploadExcel[2:-1]
@@ -150,10 +150,11 @@ def handleUploadExpData(path,uid):
     uploadExcel['实验时间'] = pd.to_datetime(uploadExcel['实验时间'])
 
 
-    # def datetime_timestamp(dt):
-    #     time.strptime(dt, '%Y-%m-%d')
-    #     s = time.mktime(time.strptime(dt, '%Y-%m-%d'))
-    #     return int(s)*1000
+
+    def datetime_timestamp(dt):
+        time.strptime(dt, '%Y-%m-%d')
+        s = time.mktime(time.strptime(dt, '%Y-%m-%d'))
+        return int(s)*1000
 
 
 
@@ -162,31 +163,41 @@ def handleUploadExpData(path,uid):
                            'loopretention', 'retention']
 
     #print(uploadExcel.head())
+    #print(uploadExcel['实验时间'].dtype)
     length=uploadExcel.shape[0]
-    print("length",length)
+    #print("length",length)
     for row in range(length):
         excelRowJson=json.loads(uploadExcel.iloc[row].to_json(force_ascii=False))
-        print(excelRowJson)
+        #print(excelRowJson)
         if excelRowJson['expname'] == None:
             break
-        labid=handleGetLid(excelRowJson['labname'])
-        experiment=Experiment(
-            lid=labid,
-            uid=uid,
-            name=excelRowJson['expname'],
-            date=datetime.datetime.fromtimestamp(excelRowJson['date']//1000),
-            status=2
-        )
-        db.session.add(experiment)
-        db.session.commit()
+
+        #labid=handleGetLid(excelRowJson['labname'])
+        # experiment=Experiment(
+        #     lid=labid,
+        #     uid=uid,
+        #     name=excelRowJson['expname'],
+        #     date=datetime.datetime.fromtimestamp(excelRowJson['date']//1000),
+        #     status=2
+        # )
+        # db.session.add(experiment)
+        # db.session.commit()
+        labid = handleGetLid(excelRowJson['labname'])
+        sql = 'INSERT INTO experiment (lid,uid,name,date,status) values (%d,%d,"%s",%d,%d)' % (
+            int(labid), int(uid), excelRowJson['expname'], excelRowJson['date'],2)
+        db.engine.execute(text(sql))
+
+        res=db.engine.execute('select eid from experiment order by eid DESC limit 1')
+        exp_eid = [r[0] for r in res][0]
+
         expdata=ExpData(
-            eid=experiment.eid,
+            eid=exp_eid,
             encapsulation=excelRowJson['encapsulation'],
             discharge=excelRowJson['discharge'],
             charge=excelRowJson['charge'],
             eficiency=excelRowJson['eficiency'],
             loopretention=excelRowJson['loopretention'],
-            retention=excelRowJson['loopretention']
+            retention=excelRowJson['retention']
         )
         db.session.add(expdata)
         db.session.commit()
